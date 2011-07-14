@@ -72,6 +72,7 @@ abstract class CatNapServer {
 
     /**
      * Serve the request.
+     * @todo this is only a stub
      *
      * @return mixed
      */
@@ -79,6 +80,7 @@ abstract class CatNapServer {
         $httpResponse = isset($_SERVER) ? true : false;
         $response = _callMethod("hello", "");
         if($httpResponse) {
+            //someone called this method natively
             return $response;
         } else {
             json_encode($response);
@@ -87,6 +89,7 @@ abstract class CatNapServer {
 
     /**
      * Determines the available methods of this class to expose as web services
+     * @todo this is only a stub
      *
      * @return void
      */
@@ -96,6 +99,7 @@ abstract class CatNapServer {
 
     /**
      * Wraps the call to the method.
+     * @todo this is only a stub
      *
      * @return string The response format will be the same as the request format (json, yaml, phps, wddx-xml)
      */

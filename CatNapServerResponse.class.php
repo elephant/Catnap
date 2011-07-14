@@ -92,12 +92,12 @@ abstract class CatNapServerResponse {
 
     /**
      * Set the HTTP Headers
+     * @todo this is only a stub
      *
      * @return void
      */
     public function setHttpHeaders() {
-        //@todo this should handle all response types
-        $this->_httpHeaders[] = "Content-Type: text/plain";
+        //@todo put common headers here
     }
 
 }
