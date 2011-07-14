@@ -11,6 +11,7 @@
  * @property-read float $requestTime
  * @property-read float $responseTime
  * @property-read float $executionTime
+ * @property-read int   $statusCode
  * @property-write mixed $data
  */
 class CatNapServerResponse {
@@ -35,9 +36,25 @@ class CatNapServerResponse {
      */
     protected $_data;
 
+    /**
+     * @var int
+     */
+    protected $_statusCode;
+
+    /**
+     * @var string
+     */
+    protected $_stackTrace;
+
+    /**
+     * @var array
+     */
+    protected $_httpHeaders;
+
     public function __construct() {
         $this->_strictlyREST = true;
         $this->_introspect();
+        $this->_httpHeaders = array();
     }
 
     public function __get($var) {
@@ -50,6 +67,9 @@ class CatNapServerResponse {
                 break;
             case 'executionTime':
                 $val = $this->_executionTime;
+                break;
+            case 'statusCode':
+                $val = $this->_statusCode;
                 break;
             case 'data':
                 $val = $this->_data;
@@ -68,6 +88,11 @@ class CatNapServerResponse {
                 $this->_data = $val;
                 break;
         }
+    }
+
+    public function setHttpHeaders() {
+        //@todo this should handle all response types
+        $this->_httpHeaders[] = "Content-Type: text/plain";
     }
 
 }

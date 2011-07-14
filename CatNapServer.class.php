@@ -4,7 +4,10 @@
  */
 
 /**
- *@author Jonathan Suchland <jonathan@suchland.org>
+ * @author Jonathan Suchland <jonathan@suchland.org>
+ *
+ * @property-read bool $debug
+ * @property-read string $responseFormat
  */
 class CatNapServer {
 
@@ -14,6 +17,11 @@ class CatNapServer {
     protected $_strictlyREST;
 
     /**
+     * @var string
+     */
+    protected $_responseFormat;
+
+    /**
      * @var bool
      */
     protected $_debug;
@@ -21,6 +29,22 @@ class CatNapServer {
     public function __construct() {
         $this->_strictlyREST = true;
         $this->_introspect();
+    }
+
+    public function __get($var) {
+        switch($var) {
+            case 'debug':
+                $val = $this->_requestTime;
+                break;
+            case 'responseFormat':
+                $val = $this->_responseFormat;
+                break;
+            default:
+                $val = null;
+                break;
+        }
+
+        return $val;
     }
 
     /**
