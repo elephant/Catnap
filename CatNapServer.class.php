@@ -9,7 +9,7 @@
  * @property-read bool $debug
  * @property-read string $responseFormat
  */
-class CatNapServer {
+abstract class CatNapServer {
 
     /**
      * @var bool
