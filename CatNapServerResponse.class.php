@@ -14,7 +14,7 @@
  * @property-read int   $statusCode
  * @property-write mixed $data
  */
-class CatNapServerResponse {
+abstract class CatNapServerResponse {
 
     /**
      * @var float
@@ -90,6 +90,11 @@ class CatNapServerResponse {
         }
     }
 
+    /**
+     * Set the HTTP Headers
+     *
+     * @return void
+     */
     public function setHttpHeaders() {
         //@todo this should handle all response types
         $this->_httpHeaders[] = "Content-Type: text/plain";
