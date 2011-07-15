@@ -30,5 +30,12 @@ class CatNapServerYAMLResponse extends CatNapServerResponse {
         parent::setHttpHeaders();
     }
 
+    /**
+     * @return string
+     */
+    public function encode() {
+        return yaml_emit($this->_payload());
+    }
+
 }
 ?>

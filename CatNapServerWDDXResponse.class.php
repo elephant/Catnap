@@ -30,5 +30,12 @@ class CatNapServerWDDXResponse extends CatNapServerResponse {
         parent::setHttpHeaders();
     }
 
+    /**
+     * @return string
+     */
+    public function encode() {
+        return wddx_serialize_value($this->_payload());
+    }
+
 }
 ?>

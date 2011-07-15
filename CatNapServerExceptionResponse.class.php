@@ -4,7 +4,7 @@
  */
 
 /**
- * Represents a plain text server response
+ * Represents an exception server response
  *
  * @author Jonathan Suchland <jonathan@suchland.org>
  *
@@ -14,7 +14,10 @@
  * @property-read int   $statusCode
  * @property-write mixed $data
  */
-class CatNapServerTextResponse extends CatNapServerResponse {
+class CatNapServerExceptionResponse extends CatNapServerResponse {
+
+    public $code;
+    public $message;
 
     public function __construct() {
         parent::__construct();
@@ -30,12 +33,8 @@ class CatNapServerTextResponse extends CatNapServerResponse {
         parent::setHttpHeaders();
     }
 
-    /**
-     * @return string
-     */
     public function encode() {
-        return var_export($this->_payload(), true);
+        return $this->code . ' ' . $this->message;
     }
-
 }
 ?>

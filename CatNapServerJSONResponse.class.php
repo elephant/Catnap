@@ -30,5 +30,12 @@ class CatNapServerJSONResponse extends CatNapServerResponse {
         parent::setHttpHeaders();
     }
 
+    /**
+     * @return string
+     */
+    public function encode() {
+        return json_encode($this->_payload());
+    }
+
 }
 ?>

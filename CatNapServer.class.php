@@ -4,6 +4,13 @@
  */
 
 /**
+ * @todo this will overwrite any previously declared __autoload function. need to fix that.
+ */
+function __autoload($className) {
+    require_once $className . '.class.php';
+}
+
+/**
  * @author Jonathan Suchland <jonathan@suchland.org>
  *
  * @property-read bool $debug
@@ -19,7 +26,22 @@ abstract class CatNapServer {
     /**
      * @var string
      */
+    protected $_methodName;
+
+    /**
+     * @var array
+     */
+    protected $_methodArgs;
+
+    /**
+     * @var string
+     */
     protected $_responseFormat;
+
+    /**
+     * @var Exception
+     */
+    protected $_exception;
 
     /**
      * @var bool
@@ -28,7 +50,9 @@ abstract class CatNapServer {
 
     public function __construct() {
         $this->_strictlyREST = true;
+        $this->_methodArgs = array();
         $this->_introspect();
+        set_exception_handler(array($this, '_exceptionHandler'));
     }
 
     public function __get($var) {
@@ -77,13 +101,14 @@ abstract class CatNapServer {
      * @return mixed
      */
     public function serve() {
-        $httpResponse = isset($_SERVER) ? true : false;
-        $response = _callMethod("hello", "");
-        if($httpResponse) {
+        $response = $this->_callMethod($this->_methodName, $this->_methodArgs);
+        if(isset($_SERVER)) {
             //someone called this method natively
             return $response;
         } else {
-            json_encode($response);
+            $responseObj = $this->_createResponseObj();
+            $responseObj->data = $response;
+            print $responseObj->encode();
         }
     }
 
@@ -104,7 +129,45 @@ abstract class CatNapServer {
      * @return string The response format will be the same as the request format (json, yaml, phps, wddx-xml)
      */
     protected function _callMethod($method, $args = null) {
-        return array(1,2,3);
+        if(!method_exists($this, $this->_methodName)) {
+            throw new Exception(404, 'Not Found');
+        }
+        $this->$method($args);
+    }
+
+    /**
+     * Converts a raw response to a CatnapServerResponse object
+     *
+     * @return CatnapServerResponse of appropriate type
+     */
+    private function _createResponseObj() {
+        switch($this->_responseFormat) {
+            case 'json':
+                $responseObj = new CatnapServerJSONResponse();
+                break;
+            case 'wddx':
+            case 'xml':
+                $responseObj = new CatnapServerWDDXResponse();
+                break;
+            case 'yaml':
+                $responseObj = new CatnapServerYAMLResponse();
+                break;
+            default:
+                $responseObj = new CatnapServerTextResponse();
+        }
+        return $responseObj;
+    }
+
+    private function _exceptionHandler($exception) {
+        if(isset($_SERVER)) {
+            //someone called this method natively
+            restore_exception_handler();
+            throw $exception;
+        } else {
+            $responseObj = $this->_createResponseObj();
+            $responseObj->exception = $exception;
+            print $responseObj->encode();
+        }
     }
 
 }
