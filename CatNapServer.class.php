@@ -36,6 +36,11 @@ abstract class CatNapServer {
     /**
      * @var string
      */
+    protected $_methodRequiredRequestMethod;
+
+    /**
+     * @var string
+     */
     protected $_responseFormat;
 
     /**
@@ -119,6 +124,9 @@ abstract class CatNapServer {
      */
     protected function _introspect() {
         //1. determine method
+        if(isset($_REQUEST['CatNapServerMethod'])) {
+            $this->_methodName = $_REQUEST['CatNapServerMethod'];
+        }
         //2. determine response type
         //3. determine args/map to method
     }
@@ -134,6 +142,14 @@ abstract class CatNapServer {
     protected function _validateRequest() {
         //1. request args
         //2. request method (if strictlyRest)
+        if($this->_strictlyREST && isset($_SERVER['REQUEST_METHOD'])
+                                && !empty($this->_methodRequiredRequestMethod)
+                                && $this->_methodRequiredRequestMethod != $_SERVER['REQUEST_METHOD']) {
+            throw new Exception(405, 'Method Not Allowed. The request should be "' . $this->_methodRequiredRequestMethod . '".');
+        }
+        if(empty($this->_methodName)) {
+            throw new Exception(400, 'Bad Request. The request did not contain a "CatNapServerMethod" argument.');
+        }
     }
 
     /**
