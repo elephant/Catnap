@@ -171,7 +171,9 @@ abstract class CatNapServerResponse implements CatNapServerInterface {
      * @return void
      */
     protected function _addStatusCode($code, $message) {
-        if(is_int($code) && $code >= 600 !array_key_exists($code, $this->_statusCodes) && !empty($message)) {
+        if(is_int($code) && $code >= 600
+                         && !array_key_exists($code, $this->_statusCodes)
+                         && !empty($message)) {
             $this->_statusCodes[$code] = $message;
         }
     }
