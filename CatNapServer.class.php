@@ -49,10 +49,10 @@ abstract class CatNapServer {
     protected $_debug;
 
     public function __construct() {
+        set_exception_handler(array($this, '_exceptionHandler'));
         $this->_strictlyREST = true;
         $this->_methodArgs = array();
         $this->_introspect();
-        set_exception_handler(array($this, '_exceptionHandler'));
     }
 
     public function __get($var) {
@@ -96,11 +96,11 @@ abstract class CatNapServer {
 
     /**
      * Serve the request.
-     * @todo this is only a stub
      *
      * @return mixed
      */
     public function serve() {
+        $this->_validateRequest();
         $responseObj = $this->_createResponseObj();
         $responseObj->data = $this->_callMethod($this->_methodName, $this->_methodArgs);
         if(isset($_SERVER)) {
@@ -118,7 +118,22 @@ abstract class CatNapServer {
      * @return void
      */
     protected function _introspect() {
+        //1. determine method
+        //2. determine response type
+        //3. determine args/map to method
+    }
 
+    /**
+     * Validate the request
+     * - check required method arguments and RESTful request (if strictlyRest)
+     * - throws an Exception if request is invalid
+     * @todo this is only a stub
+     *
+     * @return void
+     */
+    protected function _validateRequest() {
+        //1. request args
+        //2. request method (if strictlyRest)
     }
 
     /**
