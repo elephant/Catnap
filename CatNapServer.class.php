@@ -101,13 +101,12 @@ abstract class CatNapServer {
      * @return mixed
      */
     public function serve() {
-        $response = $this->_callMethod($this->_methodName, $this->_methodArgs);
+        $responseObj = $this->_createResponseObj();
+        $responseObj->data = $this->_callMethod($this->_methodName, $this->_methodArgs);
         if(isset($_SERVER)) {
             //someone called this method natively
-            return $response;
+            return $responseObj;
         } else {
-            $responseObj = $this->_createResponseObj();
-            $responseObj->data = $response;
             print $responseObj->encode();
         }
     }

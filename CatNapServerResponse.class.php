@@ -11,7 +11,7 @@
  * @property-read float $requestTime
  * @property-read float $responseTime
  * @property-read float $executionTime
- * @property-read int   $statusCode
+ * @property-write int   $statusCode
  * @property-write mixed $data
  */
 abstract class CatNapServerResponse implements CatNapServerInterface {
@@ -87,11 +87,6 @@ abstract class CatNapServerResponse implements CatNapServerInterface {
     protected $_statusCode;
 
     /**
-     * @var string
-     */
-    protected $_stackTrace;
-
-    /**
      * @var array
      */
     protected $_httpHeaders;
@@ -105,15 +100,18 @@ abstract class CatNapServerResponse implements CatNapServerInterface {
         $this->_strictlyREST = true;
         $this->_introspect();
         $this->_httpHeaders = array();
+        $this->_requestTimestamp = microtime(true);
+        $this->_responseTimestamp = 0;
+        $this->_statusCode = 200;
     }
 
     public function __get($var) {
         switch($var) {
-            case 'requestTime':
-                $val = $this->_requestTime;
+            case 'requestTimestamp':
+                $val = $this->_requestTimestamp;
                 break;
-            case 'responseTime':
-                $val = $this->_responseTime;
+            case 'responseTimestamp':
+                $val = $this->_responseTimestamp;
                 break;
             case 'executionTime':
                 $val = $this->_executionTime;
@@ -140,6 +138,19 @@ abstract class CatNapServerResponse implements CatNapServerInterface {
             case 'exception':
                 $this->_exception = $val;
                 break;
+            case 'statusCode':
+                if(is_int($val) && $val >= 600) {
+                    $this->_statusCode = $val;
+                }
+                break;
+            case 'requestTimestamp':
+                $this->_requestTimestamp = $val;
+                $this->_calculateExecutionTime();
+                break;
+            case 'responseTimestamp':
+                $this->_responseTimestamp = $val;
+                $this->_calculateExecutionTime();
+                break;
         }
     }
 
@@ -153,14 +164,53 @@ abstract class CatNapServerResponse implements CatNapServerInterface {
         //@todo put common headers here
     }
 
+    /**
+     * Add a custom status code.
+     * Codes < 600 are reserved for HTTP status codes
+     *
+     * @return void
+     */
+    protected function _addStatusCode($code, $message) {
+        if(is_int($code) && $code >= 600 !array_key_exists($code, $this->_statusCodes) && !empty($message)) {
+            $this->_statusCodes[$code] = $message;
+        }
+    }
+
+    /**
+     * Generates the full response payload that will be returned to the client.
+     *
+     * @return object
+     */
     protected function _payload() {
-        $this->_payload->data = $this->_data;
-        $this->_payload->meta->executionTime = $this->_executionTime;
-        if(isset($this->_exception) && $this->_exception instanceof Exception) {
-            $this->_payload->error->code = $this->_exception->getCode();
-            $this->_payload->error->message = $this->_exception->getMessage();
+        if(!isset($this->_payload)) {
+            $this->_payload->data = $this->_data;
+            if($this->_responseTimestamp < 1) {
+                $this->responseTimestamp = microtime(true);
+            }
+            $this->_payload->meta->executionTime = $this->_executionTime;
+            $this->_payload->meta->status->code = $this->_statusCode;
+            if(array_key_exists($this->_statusCode, $this->_statusCodes)) {
+                $this->_payload->meta->status->message = $this->_statusCodes[$this->_statusCode];
+            }
+            if(isset($this->_exception) && $this->_exception instanceof Exception) {
+                $this->_payload->error->code = $this->_payload->meta->status->code = $this->_exception->getCode();
+                $this->_payload->error->message = $this->_exception->getMessage();
+            }
         }
         return $this->_payload();
+    }
+
+    /**
+     * Calculate the execution time of the web service call.
+     *
+     * @return void
+     */
+    private function _calculateExecutionTime() {
+        if($this->_requestTimestamp > 0 && $this->_responseTimestamp > 0) {
+            $this->_executionTime = $this->_responseTimestamp - $this->_requestTimestamp;
+        } else {
+            $this->_executionTime = null;
+        }
     }
 
 }
