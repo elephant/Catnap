@@ -2,6 +2,7 @@
 /**
  * GPL
  */
+require_once 'CatnapServer.class.php';
 
 /**
  * Hello World Server
