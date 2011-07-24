@@ -14,7 +14,7 @@ class HelloWorldServer extends CatNapServer {
 
     public function __construct() {
         $this->_strictlyREST = true;
-        $this->_introspect();
+        parent::__construct();
     }
 
     public function getSayHello($name = '') {
