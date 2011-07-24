@@ -13,7 +13,6 @@ require_once 'CatnapServer.class.php';
 class HelloWorldServer extends CatNapServer {
 
     public function __construct() {
-        $this->_strictlyREST = true;
         parent::__construct();
     }
 
