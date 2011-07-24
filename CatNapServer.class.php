@@ -206,7 +206,7 @@ abstract class CatNapServer {
         return $responseObj;
     }
 
-    private function _exceptionHandler($exception) {
+    public function _exceptionHandler($exception) {
         if(isset($_SERVER)) {
             //someone called this method natively
             restore_exception_handler();
