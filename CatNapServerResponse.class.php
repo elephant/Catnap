@@ -14,7 +14,7 @@
  * @property-write int   $statusCode
  * @property-write mixed $data
  */
-abstract class CatNapServerResponse implements CatNapServerInterface {
+abstract class CatNapServerResponse implements CatNapServerResponseInterface {
 
     protected $_statusCodes = array(200 => 'OK',
                                     201 => 'Created',
@@ -98,7 +98,6 @@ abstract class CatNapServerResponse implements CatNapServerInterface {
 
     public function __construct() {
         $this->_strictlyREST = true;
-        $this->_introspect();
         $this->_httpHeaders = array();
         $this->_requestTimestamp = microtime(true);
         $this->_responseTimestamp = 0;
@@ -156,7 +155,6 @@ abstract class CatNapServerResponse implements CatNapServerInterface {
 
     /**
      * Set the HTTP Headers
-     * @todo this is only a stub
      *
      * @return void
      */
@@ -199,7 +197,7 @@ abstract class CatNapServerResponse implements CatNapServerInterface {
                 $this->_payload->error->message = $this->_exception->getMessage();
             }
         }
-        return $this->_payload();
+        return $this->_payload;
     }
 
     /**

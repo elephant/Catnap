@@ -26,6 +26,11 @@ abstract class CatNapServer {
     /**
      * @var string
      */
+    protected $_serverRequestMethod;
+
+    /**
+     * @var string
+     */
     protected $_methodName;
 
     /**
@@ -108,7 +113,7 @@ abstract class CatNapServer {
         $this->_validateRequest();
         $responseObj = $this->_createResponseObj();
         $responseObj->data = $this->_callMethod($this->_methodName, $this->_methodArgs);
-        if(isset($_SERVER)) {
+        if(!isset($_SERVER)) {
             //someone called this method natively
             return $responseObj;
         } else {
@@ -124,6 +129,20 @@ abstract class CatNapServer {
      */
     protected function _introspect() {
         //1. determine method
+        if(isset($_SERVER)) {
+            if(isset($_SERVER['REQUEST_METHOD'])) {
+                $this->_serverRequestMethod = $_SERVER['REQUEST_METHOD'];
+            }
+            if(isset($_SERVER['argv']) && isset($_SERVER['argc'])) {
+                $this->_serverRequestMethod = 'cli';
+                if(isset($_SERVER['argv'][1])) {
+                    $this->_methodName = $_SERVER['argv'][1];
+                }
+                if(isset($_SERVER['argv'][2])) {
+                    $this->_methodArgs = $_SERVER['argv'][2];
+                }
+            }
+        }
         if(isset($_REQUEST['CatNapServerMethod'])) {
             $this->_methodName = $_REQUEST['CatNapServerMethod'];
         }
@@ -142,27 +161,26 @@ abstract class CatNapServer {
     protected function _validateRequest() {
         //1. request args
         //2. request method (if strictlyRest)
-        if($this->_strictlyREST && isset($_SERVER['REQUEST_METHOD'])
+        if($this->_strictlyREST && isset($this->_serverRequestMethod)
                                 && !empty($this->_methodRequiredRequestMethod)
-                                && $this->_methodRequiredRequestMethod != $_SERVER['REQUEST_METHOD']) {
-            throw new Exception(405, 'Method Not Allowed. The request should be "' . $this->_methodRequiredRequestMethod . '".');
+                                && $this->_methodRequiredRequestMethod != $this->_serverRequestMethod) {
+            throw new Exception('Method Not Allowed. The request should be "' . $this->_methodRequiredRequestMethod . '".', 405);
         }
         if(empty($this->_methodName)) {
-            throw new Exception(400, 'Bad Request. The request did not contain a "CatNapServerMethod" argument.');
+            throw new Exception('Bad Request. The request did not contain a "CatNapServerMethod" argument.', 400);
         }
     }
 
     /**
      * Wraps the call to the method.
-     * @todo this is only a stub
      *
      * @return string The response format will be the same as the request format (json, yaml, phps, wddx-xml)
      */
     protected function _callMethod($method, $args = null) {
         if(!method_exists($this, $this->_methodName)) {
-            throw new Exception(404, 'Not Found');
+            throw new Exception('Not Found', 404);
         }
-        $this->$method($args);
+        return $this->$method($args);
     }
 
     /**
