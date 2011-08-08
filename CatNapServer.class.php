@@ -117,6 +117,7 @@ abstract class CatNapServer {
             //someone called this method natively
             return $responseObj;
         } else {
+            $responseObj->setHttpHeaders();
             print $responseObj->encode();
         }
     }

@@ -159,7 +159,9 @@ abstract class CatNapServerResponse implements CatNapServerResponseInterface {
      * @return void
      */
     public function setHttpHeaders() {
-        //@todo put common headers here
+        foreach($this->_httpHeaders as $httpHeader) {
+            header($httpHeader);
+        }
     }
 
     /**
