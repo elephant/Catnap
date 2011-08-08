@@ -34,6 +34,9 @@ class CatNapServerYAMLResponse extends CatNapServerResponse {
      * @return string
      */
     public function encode() {
+        if(!function_exists('yaml_emit')) {
+            throw new Exception('yaml_emit function does not exist. Installation instructions are available on php.net/yaml');
+        }
         return yaml_emit($this->_payload());
     }
 
