@@ -37,8 +37,26 @@ class CatNapServerYAMLResponse extends CatNapServerResponse {
         if(!function_exists('yaml_emit')) {
             throw new Exception('yaml_emit function does not exist. Installation instructions are available on php.net/yaml');
         }
-        return yaml_emit($this->_payload());
+        $payload = $this->_payload();
+        //unfortunately, yaml_emit doesn't properly support objects - need to convert to array
+
+        return yaml_emit($this->_objectToArray($payload));
     }
 
+    /**
+     * Convert an object to an associative array (including nested objects)
+     *
+     * @param $object object
+     * @return array
+     */
+    private function _objectToArray($object) {
+        $array = get_object_vars($object);
+        foreach($array as $key => $value) {
+            if(is_object($value)) {
+                $array[$key] = $this->_objectToArray($value);
+            }
+        }
+        return $array;
+    }
 }
 ?>
