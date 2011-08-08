@@ -133,6 +133,8 @@ abstract class CatNapServer {
             if(isset($_SERVER['REQUEST_METHOD'])) {
                 $this->_serverRequestMethod = $_SERVER['REQUEST_METHOD'];
             }
+
+            //support command line clients
             if(isset($_SERVER['argv']) && isset($_SERVER['argc'])) {
                 $this->_serverRequestMethod = 'cli';
                 if(isset($_SERVER['argv'][1])) {
@@ -141,10 +143,16 @@ abstract class CatNapServer {
                 if(isset($_SERVER['argv'][2])) {
                     $this->_methodArgs = $_SERVER['argv'][2];
                 }
+                if(isset($_SERVER['argv'][3])) {
+                    $this->_responseFormat = $_SERVER['argv'][3];
+                }
             }
         }
         if(isset($_REQUEST['CatNapServerMethod'])) {
             $this->_methodName = $_REQUEST['CatNapServerMethod'];
+        }
+        if(isset($_REQUEST['CatNapServerResponseFormat'])) {
+            $this->_responseFormat = $_REQUEST['CatNapServerResponseFormat'];
         }
         //2. determine response type
         //3. determine args/map to method
