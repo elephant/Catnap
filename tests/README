@@ -1,0 +1,6 @@
+Requires:
+PHPUnit 3.5 or greater. See: http://www.phpunit.de/
+
+Usage:
+
+phpunit tests/exceptions.php
