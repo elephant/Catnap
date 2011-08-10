@@ -6,9 +6,18 @@
 /**
  * @todo this will overwrite any previously declared __autoload function. need to fix that.
  */
-function __autoload($className) {
+function CatNapServer_autoload($className) {
     require_once $className . '.class.php';
 }
+
+$CatNapServer_autoloaders = array('CatNapServer_autoload');
+if(function_exists('__autoload')) {
+    $CatNapServer_autoloaders[] = '__autoload';
+    spl_autoload_register('__autoload');
+}
+
+spl_autoload_register('CatNapServer_autoload');
+
 
 /**
  * @author Jonathan Suchland <jonathan@suchland.org>
